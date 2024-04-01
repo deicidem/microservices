@@ -1,0 +1,12 @@
+@base_address = http://localhost:5027
+GET {{base_address}}/api/airports
+###
+POST {{base_address}}/api/airports
+Content-Type: application/json
+
+{
+  "name": "Minsk",
+  "address": "Minsk, Belarus",
+  "code": "MSQ"
+}
+

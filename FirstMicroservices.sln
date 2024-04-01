@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DddService", "DddService\DddService.csproj", "{530412D6-844C-4019-BD95-19952F5B1DB6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7BB3440E-587D-4387-B469-D33B32A793EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BB3440E-587D-4387-B469-D33B32A793EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BB3440E-587D-4387-B469-D33B32A793EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BB3440E-587D-4387-B469-D33B32A793EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7760DB0F-9862-424A-8261-87BAE58B6C51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7760DB0F-9862-424A-8261-87BAE58B6C51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7760DB0F-9862-424A-8261-87BAE58B6C51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7760DB0F-9862-424A-8261-87BAE58B6C51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{530412D6-844C-4019-BD95-19952F5B1DB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{530412D6-844C-4019-BD95-19952F5B1DB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{530412D6-844C-4019-BD95-19952F5B1DB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{530412D6-844C-4019-BD95-19952F5B1DB6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
