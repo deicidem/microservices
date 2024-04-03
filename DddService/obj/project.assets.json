@@ -1169,24 +1169,26 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\krono\\.nuget\\packages\\": {}
+    "C:\\Users\\Почитаев Андрей\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Code\\microservices\\DddService\\DddService.csproj",
+      "projectUniqueName": "D:\\microservices\\DddService\\DddService.csproj",
       "projectName": "DddService",
-      "projectPath": "D:\\Code\\microservices\\DddService\\DddService.csproj",
-      "packagesPath": "C:\\Users\\krono\\.nuget\\packages\\",
-      "outputPath": "D:\\Code\\microservices\\DddService\\obj\\",
+      "projectPath": "D:\\microservices\\DddService\\DddService.csproj",
+      "packagesPath": "C:\\Users\\Почитаев Андрей\\.nuget\\packages\\",
+      "outputPath": "D:\\microservices\\DddService\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\krono\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Почитаев Андрей\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {

@@ -1,6 +1,6 @@
 ﻿using DddService.Common;
 
-namespace DddService.Aggregates;
+namespace DddService.Aggregates.MissionNamespace;
 
 public class InvalidSpaceImageIdException : BadRequestException
 {
