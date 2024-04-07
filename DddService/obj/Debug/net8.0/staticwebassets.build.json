@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "D18uS3RVzoLHnRObNSUS16xfiGBqWsHH1F5xgyn08Qo=",
+  "Source": "DddService",
+  "BasePath": "_content/DddService",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

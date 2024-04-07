@@ -78,26 +78,26 @@ public class Credits
     }
 }
 
-public record Name
+public record Nickname
 {
     public string Value { get; }
 
-    private Name(string value)
+    private Nickname(string value)
     {
         Value = value;
     }
 
-    public static Name Of(string value)
+    public static Nickname Of(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
             throw new Exception();
         }
 
-        return new Name(value);
+        return new Nickname(value);
     }
 
-    public static implicit operator string(Name name)
+    public static implicit operator string(Nickname name)
     {
         return name.Value;
     }
