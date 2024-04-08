@@ -136,7 +136,7 @@ app.MapGet("api/players", async (HelldiversDbContext db) =>
 });
 app.MapGet("api/command-center/map", async (string playerNickname, HelldiversDbContext db) =>
 {
-    var players = await db.Players.Select(x => x).ToListAsync();
+    var players = await db.Players.ToListAsync();
     var player = players.FirstOrDefault();
     var dtos = players.Select(a => new PlayerDto(
         a.Id.Value.ToString(),
