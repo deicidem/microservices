@@ -4,6 +4,7 @@ using DddService.Aggregates.PlayerNamespace;
 using DddService.Common;
 using DddService.Dto;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -76,11 +77,11 @@ void SeedData(IHost app)
 app.MapPost("api/players", async (PlayerInputModel model, HelldiversDbContext db) =>
 {
     var Player = await db.Players.SingleOrDefaultAsync(x => x.Nickname.Value == model.Nickname);
-
     if (Player is not null)
     {
         return Results.BadRequest("Player with this nickname already exist!");
     }
+
     var newPlayer = Player.Create(
         PlayerId.Of(Guid.NewGuid()),
         Nickname.Of(model.Nickname)
@@ -134,18 +135,163 @@ app.MapGet("api/players", async (HelldiversDbContext db) =>
     ))
     .ToListAsync();
 });
-app.MapGet("api/command-center/map", async (string playerNickname, HelldiversDbContext db) =>
+app.MapGet("api/command-center", async (string playerId, HelldiversDbContext db) =>
 {
-    var players = await db.Players.ToListAsync();
-    var player = players.FirstOrDefault();
-    var dtos = players.Select(a => new PlayerDto(
-        a.Id.Value.ToString(),
-        a.Nickname.Value,
-        a.Credits.Value,
-        a.Experience.Value,
-        a.Rank.Value
+    var commandCenters = await db.CommandCenters.ToListAsync();
+    var commandCenter = commandCenters.FirstOrDefault(p => p.PlayerId.Value.ToString() == playerId);
+    if (commandCenter is null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.Json(new CommandCenterDto(
+        commandCenter.Id.Value.ToString(),
+        commandCenter.PlayerId.Value.ToString(),
+        commandCenter.MissionId?.Value.ToString(),
+        commandCenter.PlanetId?.Value.ToString(),
+        commandCenter.DifficultyId?.Value.ToString(),
+        commandCenter.HighestDifficultyAvailable?.ToString()!
     ));
-    return dtos;
+
+});
+app.MapGet("api/command-center/{commandCenterId}/planet", async (string commandCenterId, HelldiversDbContext db) =>
+{
+    return await db.Planets.Select(p => new PlanetDto(
+        p.Id.Value.ToString(),
+        p.Name.Value,
+        p.Status.GetDisplayName(),
+        p.Progress.Value
+    )).ToListAsync();
+});
+app.MapPost("api/command-center/{commandCenterId}/planet/{planetId}/select", async (string commandCenterId, string planetId, HelldiversDbContext db) =>
+{
+    var planets = await db.Planets.ToListAsync();
+    var planet = planets.FirstOrDefault(p => p.Id.Value.ToString() == planetId);
+    if (planet is null)
+    {
+        return Results.NotFound();
+    }
+
+    var commandCenters = await db.CommandCenters.ToListAsync();
+    var commandCenter = commandCenters.FirstOrDefault(p => p.Id.Value.ToString() == commandCenterId);
+    if (commandCenter is null)
+    {
+        return Results.NotFound();
+    }
+
+    commandCenter.SelectPlanet(planet);
+    db.SaveChanges();
+
+    return Results.Ok();
+});
+app.MapGet("api/command-center/{commandCenterId}/difficulty", async (string commandCenterId, HelldiversDbContext db) =>
+{
+    return await db.Difficulties.Select(p => new DifficultyDto(
+        p.Id.Value.ToString(),
+        p.Name.Value,
+        p.Level.Value
+    )).ToListAsync();
+});
+app.MapPost("api/command-center/{commandCenterId}/difficulty/{difficultyId}/select", async (string commandCenterId, string difficultyId, HelldiversDbContext db) =>
+{
+    var difficulties = await db.Difficulties.ToListAsync();
+    var difficulty = difficulties.FirstOrDefault(p => p.Id.Value.ToString() == difficultyId);
+    if (difficulty is null)
+    {
+        return Results.NotFound();
+    }
+
+    var commandCenters = await db.CommandCenters.Include(p => p.HighestDifficultyAvailable).ToListAsync();
+    var commandCenter = commandCenters.FirstOrDefault(p => p.Id.Value.ToString() == commandCenterId);
+    if (commandCenter is null)
+    {
+        return Results.NotFound();
+    }
+
+    commandCenter.SelectDifficulty(difficulty);
+    db.SaveChanges();
+
+    return Results.Ok();
+});
+app.MapGet("api/command-center/{commandCenterId}/mission-type", async (string commandCenterId, HelldiversDbContext db) =>
+{
+    return await db.MissionTypes.Select(p => new MissionTypeDto(
+        p.Id.Value.ToString(),
+        p.Name.Value,
+        p.Description.Value,
+        p.Goals.GetGoals().Select(g => g.Value)
+    )).ToListAsync();
+});
+app.MapPost("api/command-center/{commandCenterId}/mission", async (string commandCenterId, string missionTypeId, HelldiversDbContext db) =>
+{
+    var missionTypes = await db.MissionTypes.ToListAsync();
+    var missionType = missionTypes.FirstOrDefault(p => p.Id.Value.ToString() == missionTypeId);
+    if (missionType is null)
+    {
+        return Results.NotFound();
+    }
+
+    var commandCenters = await db.CommandCenters.ToListAsync();
+    var commandCenter = commandCenters.FirstOrDefault(p => p.Id.Value.ToString() == commandCenterId);
+    if (commandCenter is null)
+    {
+        return Results.NotFound();
+    }
+
+    var mission = commandCenter.InitiateMission(missionType);
+
+    db.SaveChanges();
+
+    return Results.Ok();
+});
+
+app.MapPost("api/command-center/{commandCenterId}/mission/search", async (string commandCenterId, HelldiversDbContext db) =>
+{
+    var commandCenters = await db.CommandCenters.ToListAsync();
+    var commandCenter = commandCenters.FirstOrDefault(p => p.Id.Value.ToString() == commandCenterId);
+    if (commandCenter is null)
+    {
+        return Results.NotFound();
+    }
+
+    var missions = await db.Missions.ToListAsync();
+    var mission = commandCenter.SearchForMission(missions);
+
+    await db.SaveChangesAsync();
+
+    return Results.Ok();
+});
+
+app.MapPost("api/command-center/{commandCenterId}/mission/start", async (string commandCenterId, HelldiversDbContext db) =>
+{
+    var commandCenters = await db.CommandCenters.ToListAsync();
+    var commandCenter = commandCenters.FirstOrDefault(p => p.Id.Value.ToString() == commandCenterId);
+    if (commandCenter is null)
+    {
+        return Results.NotFound();
+    }
+
+    commandCenter.StartMission();
+
+    await db.SaveChangesAsync();
+
+    return Results.Ok();
+});
+
+app.MapPost("api/command-center/{commandCenterId}/mission/abandon", async (string commandCenterId, HelldiversDbContext db) =>
+{
+    var commandCenters = await db.CommandCenters.ToListAsync();
+    var commandCenter = commandCenters.FirstOrDefault(p => p.Id.Value.ToString() == commandCenterId);
+    if (commandCenter is null)
+    {
+        return Results.NotFound();
+    }
+
+    commandCenter.AbandonMission();
+
+    await db.SaveChangesAsync();
+
+    return Results.Ok();
 });
 
 
@@ -180,18 +326,14 @@ public class HelldiversDbContext : DbContext
         modelBuilder.Entity<Player>().Property(r => r.Id).ValueGeneratedNever()
             .HasConversion<Guid>(PlayerId => PlayerId.Value, dbId => PlayerId.Of(dbId));
 
-        modelBuilder.Entity<Player>().OwnsOne(
-            x => x.Nickname,
-            a =>
-            {
-                a.Property(p => p.Value)
-                    .HasColumnName(nameof(Player.Nickname))
+        modelBuilder.Entity<Player>().ComplexProperty(p => p.Nickname, p =>
+        {
+            p.Property(p => p.Value).HasColumnName(nameof(Player.Nickname))
                     .HasMaxLength(50)
                     .IsRequired();
-            }
-        );
+        });
 
-        modelBuilder.Entity<Player>().OwnsOne(
+        modelBuilder.Entity<Player>().ComplexProperty(
             x => x.Credits,
             a =>
             {
@@ -201,7 +343,7 @@ public class HelldiversDbContext : DbContext
             }
         );
 
-        modelBuilder.Entity<Player>().OwnsOne(
+        modelBuilder.Entity<Player>().ComplexProperty(
             x => x.Experience,
             a =>
             {
@@ -211,7 +353,7 @@ public class HelldiversDbContext : DbContext
             }
         );
 
-        modelBuilder.Entity<Player>().OwnsOne(
+        modelBuilder.Entity<Player>().ComplexProperty(
             x => x.Rank,
             a =>
             {
@@ -232,7 +374,7 @@ public class HelldiversDbContext : DbContext
         modelBuilder.Entity<Difficulty>().Property(r => r.Id).ValueGeneratedNever()
             .HasConversion<Guid>(DifficultyId => DifficultyId.Value, dbId => DifficultyId.Of(dbId));
 
-        modelBuilder.Entity<Difficulty>().OwnsOne(
+        modelBuilder.Entity<Difficulty>().ComplexProperty(
             x => x.Name,
             a =>
             {
@@ -242,7 +384,7 @@ public class HelldiversDbContext : DbContext
                     .IsRequired();
             }
         );
-        modelBuilder.Entity<Difficulty>().OwnsOne(
+        modelBuilder.Entity<Difficulty>().ComplexProperty(
             x => x.Level,
             a =>
             {
@@ -258,7 +400,7 @@ public class HelldiversDbContext : DbContext
         modelBuilder.Entity<Objective>().HasKey(r => r.Id);
         modelBuilder.Entity<Objective>().Property(r => r.Id).ValueGeneratedNever()
             .HasConversion<Guid>(ObjectiveId => ObjectiveId.Value, dbId => ObjectiveId.Of(dbId));
-        modelBuilder.Entity<Objective>().OwnsOne(
+        modelBuilder.Entity<Objective>().ComplexProperty(
             x => x.Goal,
             a =>
             {
@@ -268,7 +410,7 @@ public class HelldiversDbContext : DbContext
                     .IsRequired();
             }
         );
-        modelBuilder.Entity<Objective>().OwnsOne(
+        modelBuilder.Entity<Objective>().ComplexProperty(
             x => x.IsCompleted,
             a =>
             {
@@ -284,7 +426,7 @@ public class HelldiversDbContext : DbContext
         modelBuilder.Entity<MissionType>().Property(r => r.Id).ValueGeneratedNever()
             .HasConversion<Guid>(MissionTypeId => MissionTypeId.Value, dbId => MissionTypeId.Of(dbId));
 
-        modelBuilder.Entity<MissionType>().OwnsOne(
+        modelBuilder.Entity<MissionType>().ComplexProperty(
             x => x.Name,
             a =>
             {
@@ -295,7 +437,7 @@ public class HelldiversDbContext : DbContext
             }
         );
 
-        modelBuilder.Entity<MissionType>().OwnsOne(
+        modelBuilder.Entity<MissionType>().ComplexProperty(
             x => x.Description,
             a =>
             {
@@ -306,7 +448,7 @@ public class HelldiversDbContext : DbContext
             }
         );
 
-        modelBuilder.Entity<MissionType>().OwnsOne(
+        modelBuilder.Entity<MissionType>().ComplexProperty(
             x => x.Goals,
             a =>
             {
@@ -322,7 +464,7 @@ public class HelldiversDbContext : DbContext
         modelBuilder.Entity<Planet>().Property(r => r.Id).ValueGeneratedNever()
             .HasConversion<Guid>(PlanetId => PlanetId.Value, dbId => PlanetId.Of(dbId));
 
-        modelBuilder.Entity<Planet>().OwnsOne(
+        modelBuilder.Entity<Planet>().ComplexProperty(
             x => x.Name,
             a =>
             {
@@ -333,7 +475,7 @@ public class HelldiversDbContext : DbContext
             }
         );
 
-        modelBuilder.Entity<Planet>().OwnsOne(
+        modelBuilder.Entity<Planet>().ComplexProperty(
             x => x.Progress,
             a =>
             {
@@ -349,7 +491,7 @@ public class HelldiversDbContext : DbContext
         modelBuilder.Entity<Mission>().Property(r => r.Id).ValueGeneratedNever()
             .HasConversion<Guid>(MissionId => MissionId.Value, dbId => MissionId.Of(dbId));
 
-        modelBuilder.Entity<Mission>().OwnsOne(
+        modelBuilder.Entity<Mission>().ComplexProperty(
             x => x.Reinforcements,
             a =>
             {
@@ -359,7 +501,7 @@ public class HelldiversDbContext : DbContext
             }
         );
 
-        modelBuilder.Entity<Mission>().OwnsOne(
+        modelBuilder.Entity<Mission>().ComplexProperty(
             x => x.Squad,
             a =>
             {

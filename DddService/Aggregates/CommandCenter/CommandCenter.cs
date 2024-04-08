@@ -153,11 +153,15 @@ public class Mission : Entity<MissionId>
     {
         if (Squad.GetPlayers().Count == 1)
         {
-            UpdateStatus(MissionStatus.Abandoned);
+            Finish(MissionStatus.Abandoned);
         }
         else
         {
             Squad = Squad.Of([.. Squad.GetPlayers().Where(x => x != player.Id)]);
+            if (Initiator.Id.Equals(player.Id))
+            {
+                InitiatorId = Squad.GetPlayers().First();
+            }
         }
     }
 
@@ -201,12 +205,12 @@ public class CommandCenter : Aggregate<CommandCenterId>
 {
     public Player Player { get; set; } = default!;
     public PlayerId PlayerId { get; set; } = default!;
-    public Planet Planet { get; set; } = default!;
-    public PlanetId PlanetId { get; set; } = default!;
-    public Mission Mission { get; set; } = default!;
-    public MissionId MissionId { get; set; } = default!;
-    public Difficulty Difficulty { get; set; } = default!;
-    public DifficultyId DifficultyId { get; set; } = default!;
+    public Planet? Planet { get; set; } = default!;
+    public PlanetId? PlanetId { get; set; } = default!;
+    public Mission? Mission { get; set; } = default!;
+    public MissionId? MissionId { get; set; } = default!;
+    public Difficulty? Difficulty { get; set; } = default!;
+    public DifficultyId? DifficultyId { get; set; } = default!;
     public Difficulty HighestDifficultyAvailable { get; set; } = default!;
     public DifficultyId HighestDifficultyAvailableId { get; set; } = default!;
     public static CommandCenter Create(CommandCenterId id, Player player, Difficulty startDifficulty)
@@ -218,20 +222,102 @@ public class CommandCenter : Aggregate<CommandCenterId>
             HighestDifficultyAvailable = startDifficulty,
         };
     }
-    public ICollection<Planet> OpenMap()
-    {
-        return new List<Planet> { Planet };
-    }
-    public void SelectDifficulty(Difficulty difficulty)
-    {
-        Difficulty = difficulty;
-    }
-    public void UpdateHighestDifficultyAvailable(Difficulty difficulty)
-    {
-        HighestDifficultyAvailable = difficulty;
-    }
     public void SelectPlanet(Planet planet)
     {
         Planet = planet;
     }
+    public void SelectDifficulty(Difficulty difficulty)
+    {
+        if (difficulty.Level > HighestDifficultyAvailable.Level)
+        {
+            throw new Exception();
+        }
+        Difficulty = difficulty;
+    }
+    public Mission InitiateMission(MissionType missionType)
+    {
+        if (Mission != null || Difficulty == null || Planet == null)
+        {
+            throw new Exception();
+        }
+        var mission = Mission.Create(
+            MissionId.Of(Guid.NewGuid()),
+            missionType,
+            Player,
+            Difficulty,
+            Planet
+        );
+        Mission = mission;
+        return mission;
+    }
+
+    public void StartMission()
+    {
+        if (Mission == null)
+        {
+            throw new Exception();
+        }
+        if (!Player.Id.Equals(Mission.InitiatorId))
+        {
+            throw new Exception();
+        }
+
+        Mission.Start();
+    }
+
+    public void AbandonMission()
+    {
+        if (Mission == null)
+        {
+            throw new Exception();
+        }
+
+        Mission.RemoveFromSquad(Player);
+    }
+
+    public Mission SearchForMission(IEnumerable<Mission> missions)
+    {
+        if (Mission != null)
+        {
+            throw new Exception();
+        }
+
+        var mission = missions.Where(m => m.Status == MissionStatus.Initiated ||
+                m.Status == MissionStatus.InProgress &&
+                m.Difficulty.Level <= HighestDifficultyAvailable.Level &&
+                m.Squad.GetPlayers().Count < 4)
+            .FirstOrDefault();
+
+        if (mission == null)
+        {
+            throw new Exception();
+        }
+
+        mission.AddToSquad(Player);
+        Mission = mission;
+
+        return mission;
+    }
+
+    public void FinishMission()
+    {
+        if (Mission == null)
+        {
+            throw new Exception();
+        }
+        if (!Player.Id.Equals(Mission.InitiatorId))
+        {
+            throw new Exception();
+        }
+        Mission.Finish(MissionStatus.Completed);
+    }
+
+
+
+    public void UpdateHighestDifficultyAvailable(Difficulty difficulty)
+    {
+        HighestDifficultyAvailable = difficulty;
+    }
+
+
 }
