@@ -4,14 +4,15 @@ using DddService.Aggregates.CommandCenterNamespace;
 using DddService.Common;
 
 namespace DddService.Aggregates.PlayerNamespace;
-public class Player : Aggregate<PlayerId>
+public class Player : Aggregate
 {
+    public Guid Id { get; set; } = default!;
     public Nickname Nickname { get; set; } = default!;
     public Rank Rank { get; set; } = default!;
     public Credits Credits { get; set; } = default!;
     public Experience Experience { get; set; } = default!;
-    public CommandCenter? CommandCenter { get; set; }
-    public CommandCenterId? CommandCenterId { get; set; }
+    public virtual CommandCenter? CommandCenter { get; set; }
+    public Guid? CommandCenterId { get; set; }
     public static Player Create(Player player)
     {
         return new Player
@@ -25,7 +26,7 @@ public class Player : Aggregate<PlayerId>
             CommandCenterId = player.CommandCenterId
         };
     }
-    public static Player Create(PlayerId id, Nickname name, Rank rank, Credits credits, Experience experience, CommandCenter commandCenter, CommandCenterId commandCenterId, bool isDeleted = false)
+    public static Player Create(Guid id, Nickname name, Rank rank, Credits credits, Experience experience, CommandCenter commandCenter, Guid commandCenterId, bool isDeleted = false)
     {
         return new Player
         {
@@ -36,10 +37,9 @@ public class Player : Aggregate<PlayerId>
             Experience = experience,
             CommandCenter = commandCenter,
             CommandCenterId = commandCenterId,
-            IsDeleted = isDeleted
         };
     }
-    public static Player Create(PlayerId id, Nickname name)
+    public static Player Create(Guid id, Nickname name)
     {
         return new Player
         {

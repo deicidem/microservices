@@ -1,177 +1,187 @@
-﻿// using System.Collections;
-// using DddService.Aggregates.PlayerNamespace;
-// using DddService.Common;
+﻿using DddService.Aggregates.PlayerNamespace;
+using DddService.Common;
 
-// namespace DddService.Aggregates.MissionNamespace;
-// public class Objective : Entity<ObjectiveId>
-// {
-//     public string Goal { get; private set; } = default!;
-//     public bool IsCompleted { get; private set; }
-//     public static Objective Create(Goal goal)
-//     {
-//         return new Objective
-//         {
-//             Goal = goal.Value,
-//             IsCompleted = false
-//         };
-//     }
-//     public void Complete()
-//     {
-//         IsCompleted = true;
-//     }
-// }
-// public class MissionType : Entity<MissionTypeId>
-// {
-//     public Name Name { get; private set; } = default!;
-//     public Description Description { get; private set; } = default!;
-//     public Goals Goals { get; private set; } = default!;
+namespace DddService.Aggregates.MissionNamespace;
 
-//     public static MissionType Create(Name name, Description description, Goals goals)
-//     {
-//         return new MissionType
-//         {
-//             Name = name,
-//             Description = description,
-//             Goals = goals
-//         };
-//     }
-// }
+public class Planet : Entity
+{
+    public PlanetName Name { get; set; } = default!;
+    public LiberationProgress Progress { get; set; } = default!;
+    public LiberationStatus Status { get; set; } = default!;
 
-// public class Mission : Aggregate<MissionId>
-// {
-//     public MissionType Type { get; private set; } = default!;
-//     public Time Time { get; private set; } = default!;
-//     public PlanetId PlanetId { get; private set; } = default!;
-//     public DifficultyId DifficultyId { get; private set; } = default!;
-//     public PlayerId InitiatorId { get; private set; } = default!;
-//     public StartedAt StartedAt { get; private set; } = default!;
-//     public MissionStatus Status { get; private set; } = default!;
-//     public FinishedAt FinishedAt { get; private set; } = default!;
-//     public ICollection<PlayerId> Squad { get; private set; } = default!;
-//     public ICollection<Objective> Objectives { get; private set; } = default!;
+    public static Planet Create(Guid id, PlanetName name, LiberationStatus status)
+    {
+        if (status == LiberationStatus.InProgress)
+        {
+            throw new Exception();
+        }
+        var progress = LiberationProgress.Of(0);
 
-//     public static Mission Initiate(PlanetId planetId, DifficultyId difficultyId, PlayerId initiatorId)
-//     {
-//         // Будет браться случайный тип миссии
-//         var destroyBaseMission = MissionType.Create(
-//             Name.Of("Destroy base"),
-//             Description.Of("Destroy enemy bases on north and south"),
-//             Goals.Of([Goal.Of("Destroy enemy bases on north"), Goal.Of("Destroy enemy bases on south")])
-//         );
+        if (status == LiberationStatus.Liberated)
+        {
+            progress = LiberationProgress.Of(100);
+        }
 
-//         var objectives = destroyBaseMission.Goals.Value.Select(Objective.Create).ToList();
+        if (status == LiberationStatus.Occupied)
+        {
+            progress = LiberationProgress.Of(0);
+        }
 
-//         // Проверить доступна ли сложность игроку
+        return new Planet
+        {
+            Id = id,
+            Name = name,
+            Status = status,
+            Progress = progress,
+        };
+    }
 
-//         return new Mission
-//         {
-//             Type = destroyBaseMission,
-//             Objectives = objectives,
-//             PlanetId = planetId,
-//             DifficultyId = difficultyId,
-//             InitiatorId = initiatorId,
-//             Squad = [initiatorId]
-//         };
-//     }
-//     public void Start(PlayerId playerId)
-//     {
-//         if (playerId != InitiatorId)
-//         {
-//             throw new Exception();
-//         }
-//         StartedAt = StartedAt.Now();
-//     }
+    public void UpdateProgress(LiberationProgress progress)
+    {
+        if (progress == 100)
+        {
+            Status = LiberationStatus.Liberated;
+        }
+        else if (progress == 0)
+        {
+            Status = LiberationStatus.Occupied;
+        }
 
-//     public void Join(PlayerId playerId)
-//     {
-//         if (Squad.Count >= 4)
-//         {
-//             throw new Exception();
-//         }
-//         if (Squad.Contains(playerId))
-//         {
-//             throw new Exception();
-//         }
-//         Squad.Add(playerId);
-//     }
+        Progress = progress;
+    }
+}
 
-//     public void Abandon(PlayerId playerId)
-//     {
-//         if (!Squad.Contains(playerId))
-//         {
-//             throw new Exception();
-//         }
 
-//         Squad.Remove(playerId);
+public class Objective : Entity
+{
+    public Goal Goal { get; private set; } = default!;
+    public IsCompleted IsCompleted { get; private set; } = default!;
+    public Guid MissionId { get; private set; }
+    public Mission Mission { get; private set; }
+    public static Objective Create(Guid id, Goal goal, Mission mission)
+    {
+        return new Objective
+        {
+            Id = id,
+            Goal = goal,
+            Mission = mission,
+            IsCompleted = IsCompleted.Of(false)
+        };
+    }
+    public void Complete()
+    {
+        IsCompleted = IsCompleted.Of(true);
+    }
+}
+public class MissionType : Entity
+{
+    public Name Name { get; private set; } = default!;
+    public Description Description { get; private set; } = default!;
+    public Goals Goals { get; private set; } = default!;
 
-//         if (playerId == InitiatorId)
-//         {
-//             Squad.ToList().ForEach(Abandon);
-//         }
+    public static MissionType Create(Guid id, Name name, Description description, Goals goals)
+    {
+        return new MissionType
+        {
+            Id = id,
+            Name = name,
+            Description = description,
+            Goals = goals
+        };
+    }
+}
 
-//         if (Squad.Count == 0)
-//         {
-//             Fail();
-//         }
+public class Mission : Aggregate
+{
+    public MissionType Type { get; set; } = default!;
+    public Guid TypeId { get; set; } = default!;
+    public MissionStatus Status { get; set; } = default!;
+    public ICollection<Objective> Objectives { get; set; } = default!;
+    public Player Initiator { get; set; } = default!;
+    public Guid InitiatorId { get; set; } = default!;
 
-//     }
+    public Difficulty Difficulty { get; set; } = default!;
+    public Planet Planet { get; set; } = default!;
+    public Guid PlanetId { get; set; } = default!;
+    public Squad Squad { get; set; } = default!;
+    public Reinforcements Reinforcements { get; set; } = default!;
 
-//     public void Fail()
-//     {
-//         if (Status != MissionStatus.InProgress)
-//         {
-//             throw new Exception();
-//         }
-//         Status = MissionStatus.Failed;
-//         FinishedAt = FinishedAt.Now();
-//         RewardSquad();
-//     }
+    public static Mission Create(Guid id, MissionType type, Player initiator, Difficulty difficulty, Planet planet)
+    {
+        var mission = new Mission
+        {
+            Id = id,
+            Type = type,
+            Planet = planet,
+            Difficulty = difficulty,
+            Initiator = initiator,
+            Status = MissionStatus.Initiated,
+            Squad = Squad.Of([initiator.Id]),
+            Reinforcements = Reinforcements.Default(),
+        };
 
-//     public void CompleteObjective(ObjectiveId objectiveId)
-//     {
-//         if (!Objectives.Any(x => x.Id == objectiveId))
-//         {
-//             throw new Exception();
-//         }
+        mission.Objectives = type.Goals.GetGoals().Select(g => Objective.Create(
+            Guid.NewGuid(),
+            g,
+            mission
+        )).ToList();
 
-//         Objectives.First(x => x.Id == objectiveId).Complete();
-//     }
+        return mission;
+    }
 
-//     public void Complete()
-//     {
-//         if (Status != MissionStatus.InProgress)
-//         {
-//             throw new Exception();
-//         }
-//         if (!Objectives.All(o => o.IsCompleted))
-//         {
-//             throw new Exception();
-//         }
+    public void AddToSquad(Player player)
+    {
+        Squad = Squad.Of([.. Squad.GetPlayers(), player.Id]);
+    }
 
-//         Status = MissionStatus.Completed;
-//         FinishedAt = FinishedAt.Now();
-//         RewardSquad();
-//         // Изменить статус осовобождение планеты (событие)
-//     }
+    public void RemoveFromSquad(Player player)
+    {
+        if (Squad.GetPlayers().Count == 1)
+        {
+            Finish(MissionStatus.Abandoned);
+        }
+        else
+        {
+            Squad = Squad.Of([.. Squad.GetPlayers().Where(x => x != player.Id)]);
+            if (Initiator.Id.Equals(player.Id))
+            {
+                InitiatorId = Squad.GetPlayers().First();
+            }
+        }
+    }
 
-//     private void RewardSquad()
-//     {
-//         Credits credits;
-//         Experience experience;
-//         var completedObjectives = Objectives.ToList().Count(o => o.IsCompleted);
-//         // GetDifficultyById
-//         var difficulty = Difficulty.Create(DifficultyNamespace.Name.Of("Easy"), Level.Of(1));
+    public void Start()
+    {
+        if (Status != MissionStatus.Initiated)
+        {
+            throw new Exception();
+        }
 
-//         credits = Credits.Of(completedObjectives * 100 * difficulty.Level);
-//         experience = Experience.Of(completedObjectives * 200 * difficulty.Level);
+        if (Squad.GetPlayers().Count == 0)
+        {
+            throw new Exception();
+        }
 
-//         // GetPlayerById
-//         Squad.ToList().ForEach(x => RewardPlayer(Player.Create(PlayerNamespace.Nickname.Of("Player")), credits, experience));
-//     }
+        UpdateStatus(MissionStatus.InProgress);
+    }
 
-//     private static void RewardPlayer(Player player, Credits credits, Experience experience)
-//     {
-//         player.GainCredits(credits);
-//         player.GainExperience(experience);
-//     }
-// }
+    public void Finish(MissionStatus status)
+    {
+        if (Status != MissionStatus.InProgress)
+        {
+            throw new Exception();
+        }
+
+        if (status == MissionStatus.Initiated || status == MissionStatus.InProgress)
+        {
+            throw new Exception();
+        }
+
+        UpdateStatus(status);
+    }
+
+    private void UpdateStatus(MissionStatus status)
+    {
+        Status = status;
+    }
+}

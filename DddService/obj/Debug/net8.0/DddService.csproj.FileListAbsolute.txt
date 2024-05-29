@@ -37,3 +37,5 @@ C:\Users\krono\microservices\DddService\obj\Debug\net8.0\refint\DddService.dll
 C:\Users\krono\microservices\DddService\obj\Debug\net8.0\DddService.pdb
 C:\Users\krono\microservices\DddService\obj\Debug\net8.0\DddService.genruntimeconfig.cache
 C:\Users\krono\microservices\DddService\obj\Debug\net8.0\ref\DddService.dll
+C:\Users\krono\microservices\DddService\bin\Debug\net8.0\Castle.Core.dll
+C:\Users\krono\microservices\DddService\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Proxies.dll

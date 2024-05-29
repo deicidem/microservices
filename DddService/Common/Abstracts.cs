@@ -1,14 +1,14 @@
 ﻿namespace DddService.Common;
 
 
-public abstract class Entity<T> : IEntity<T>
+public abstract class Entity : IEntity
 {
-    public T Id { get; set; }
+    public Guid Id { get; set; }
     public bool IsDeleted { get; set; }
 }
 
 // Aggregates
-public abstract class Aggregate<TId> : Entity<TId>, IAggregate<TId>
+public abstract class Aggregate : Entity, IAggregate
 {
-    
+
 }

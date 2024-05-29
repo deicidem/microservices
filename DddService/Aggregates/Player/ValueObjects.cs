@@ -3,31 +3,6 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 namespace DddService.Aggregates.PlayerNamespace;
 
-public class PlayerId
-{
-    public Guid Value { get; }
-
-    private PlayerId(Guid value)
-    {
-        Value = value;
-    }
-
-    public static PlayerId Of(Guid value)
-    {
-        if (value == Guid.Empty)
-        {
-            throw new Exception();
-        }
-
-        return new PlayerId(value);
-    }
-
-    public static implicit operator Guid(PlayerId id)
-    {
-        return id.Value;
-    }
-}
-
 public class Experience
 {
     public int Value { get; }

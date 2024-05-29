@@ -1,3 +1,5 @@
-﻿namespace DddService.Dto;
+﻿using DddService.Aggregates.MissionNamespace;
 
-public record MissionTypeDto(string Id, string Name, string Description, IEnumerable<string> Goals);
+namespace DddService.Dto;
+
+public record MissionTypeDto(string Id, string Name, string Description, IEnumerable<Goal> Goals);

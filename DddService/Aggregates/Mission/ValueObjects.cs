@@ -1,298 +1,355 @@
-﻿// using System.Collections;
-// using System.Text.Json.Nodes;
-// using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using DddService.Aggregates.PlayerNamespace;
+namespace DddService.Aggregates.MissionNamespace;
+public record PlanetName
+{
+    public string Value { get; }
 
-// namespace DddService.Aggregates.MissionNamespace;
+    private PlanetName(string value)
+    {
+        Value = value;
+    }
 
-// public class MissionId
-// {
-//     public Guid Value { get; }
+    public static PlanetName Of(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new Exception();
+        }
 
-//     private MissionId(Guid value)
-//     {
-//         Value = value;
-//     }
+        return new PlanetName(value);
+    }
 
-//     public static MissionId Of(Guid value)
-//     {
-//         if (value == Guid.Empty)
-//         {
-//             throw new Exception();
-//         }
+    public static implicit operator string(PlanetName name)
+    {
+        return name.Value;
+    }
+}
+public record LiberationProgress
+{
+    public int Value { get; }
 
-//         return new MissionId(value);
-//     }
+    private LiberationProgress(int value)
+    {
+        Value = value;
+    }
 
-//     public static implicit operator Guid(MissionId id)
-//     {
-//         return id.Value;
-//     }
-// }
-// public class MissionTypeId
-// {
-//     public Guid Value { get; }
+    public static LiberationProgress Of(int value)
+    {
+        if (value < 0 || value > 100)
+        {
+            throw new Exception();
+        }
 
-//     private MissionTypeId(Guid value)
-//     {
-//         Value = value;
-//     }
+        return new LiberationProgress(value);
+    }
 
-//     public static MissionTypeId Of(Guid value)
-//     {
-//         if (value == Guid.Empty)
-//         {
-//             throw new Exception();
-//         }
+    public static implicit operator int(LiberationProgress progress)
+    {
+        return progress.Value;
+    }
+}
 
-//         return new MissionTypeId(value);
-//     }
+public enum Difficulty
+{
+    Easy = 1,
+    Medium = 2,
+    Hard = 3,
+    Expert = 4,
+    Hell = 5,
+}
 
-//     public static implicit operator Guid(MissionTypeId id)
-//     {
-//         return id.Value;
-//     }
-// }
-// public class ObjectiveId
-// {
-//     public Guid Value { get; }
-
-//     private ObjectiveId(Guid value)
-//     {
-//         Value = value;
-//     }
-
-//     public static ObjectiveId Of(Guid value)
-//     {
-//         if (value == Guid.Empty)
-//         {
-//             throw new Exception();
-//         }
-
-//         return new ObjectiveId(value);
-//     }
-
-//     public static implicit operator Guid(ObjectiveId id)
-//     {
-//         return id.Value;
-//     }
-// }
-// public record Name
-// {
-//     public string Value { get; }
-
-//     private Name(string value)
-//     {
-//         Value = value;
-//     }
-
-//     public static Name Of(string value)
-//     {
-//         if (string.IsNullOrWhiteSpace(value))
-//         {
-//             throw new Exception();
-//         }
-
-//         return new Name(value);
-//     }
-
-//     public static implicit operator string(Name name)
-//     {
-//         return name.Value;
-//     }
-// }
-
-// public record Description
-// {
-//     public string Value { get; }
-
-//     private Description(string value)
-//     {
-//         Value = value;
-//     }
-
-//     public static Description Of(string value)
-//     {
-//         if (string.IsNullOrWhiteSpace(value))
-//         {
-//             throw new Exception();
-//         }
-
-//         return new Description(value);
-//     }
-
-//     public static implicit operator string(Description description)
-//     {
-//         return description.Value;
-//     }
-// }
-
-// public record Goal
-// {
-//     public string Value { get; }
-//     public bool IsCompleted { get; private set; }
-
-//     private Goal(string value)
-//     {
-//         Value = value;
-//     }
-
-//     public static Goal Of(string value)
-//     {
-//         if (string.IsNullOrWhiteSpace(value))
-//         {
-//             throw new Exception();
-//         }
-
-//         return new Goal(value);
-//     }
+public enum LiberationStatus
+{
+    Occupied = 1,
+    InProgress = 2,
+    Liberated = 3,
+}
 
 
-// }
 
-// public record Goals
-// {
-//     public List<Goal> Value { get; }
 
-//     private Goals(List<Goal> value)
-//     {
-//         Value = value;
-//     }
+public record Reinforcements
+{
+    public int Value { get; }
 
-//     public static Goals Of(List<Goal> value)
-//     {
-//         if (value is null || value.Count == 0)
-//         {
-//             throw new Exception();
-//         }
+    private Reinforcements(int value)
+    {
+        Value = value;
+    }
+    public static Reinforcements Default()
+    {
+        return new Reinforcements(20);
+    }
+    public static Reinforcements Of(int value)
+    {
+        if (value < 0 || value > 30)
+        {
+            throw new Exception();
+        }
 
-//         return new Goals(value);
-//     }
+        return new Reinforcements(value);
+    }
 
-//     public static implicit operator List<Goal>(Goals objectives)
-//     {
-//         return objectives.Value;
-//     }
-// }
+    public static implicit operator int(Reinforcements reinforcements)
+    {
+        return reinforcements.Value;
+    }
+}
 
-// public record Time
-// {
-//     public int Value { get; }
+public record Name
+{
+    public string Value { get; }
 
-//     private Time(int value)
-//     {
-//         Value = value;
-//     }
+    private Name(string value)
+    {
+        Value = value;
+    }
 
-//     public static Time Of(int value)
-//     {
-//         if (value < 0 || value > 60)
-//         {
-//             throw new Exception();
-//         }
+    public static Name Of(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new Exception();
+        }
 
-//         return new Time(value);
-//     }
+        return new Name(value);
+    }
 
-//     public static implicit operator int(Time time)
-//     {
-//         return time.Value;
-//     }
-// }
+    public static implicit operator string(Name name)
+    {
+        return name.Value;
+    }
+}
+public record Description
+{
+    public string Value { get; }
 
-// public class InitiatorId
-// {
-//     public Guid Value { get; }
+    private Description(string value)
+    {
+        Value = value;
+    }
 
-//     private InitiatorId(Guid value)
-//     {
-//         Value = value;
-//     }
+    public static Description Of(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new Exception();
+        }
 
-//     public static InitiatorId Of(Guid value)
-//     {
-//         if (value == Guid.Empty)
-//         {
-//             throw new Exception();
-//         }
+        return new Description(value);
+    }
 
-//         return new InitiatorId(value);
-//     }
+    public static implicit operator string(Description description)
+    {
+        return description.Value;
+    }
+}
 
-//     public static implicit operator Guid(InitiatorId id)
-//     {
-//         return id.Value;
-//     }
-// }
+public record Goal
+{
+    public string Value { get; }
+    [JsonConstructor]
+    private Goal(string value)
+    {
+        Value = value;
+    }
+    public static Goal Of(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new Exception();
+        }
 
-// public class Squad
-// {
-//     public List<Guid> Value { get; }
+        return new Goal(value);
+    }
 
-//     private Squad(List<Guid> value)
-//     {
-//         Value = value;
-//     }
+    public static implicit operator string(Goal goal)
+    {
+        return goal.Value;
+    }
+}
+public class IsCompleted
+{
+    public bool Value { get; }
 
-//     public static Squad Of(List<Guid> value)
-//     {
-//         if (value is null || value.Count == 0)
-//         {
-//             throw new Exception();
-//         }
+    private IsCompleted(bool value)
+    {
+        Value = value;
+    }
 
-//         return new Squad(value);
-//     }
+    public static IsCompleted Of(bool value)
+    {
+        return new IsCompleted(value);
+    }
 
-//     public static implicit operator List<Guid>(Squad squad)
-//     {
-//         return squad.Value;
-//     }
-// }
-// public record StartedAt
-// {
-//     public DateTime Value { get; }
+    public static implicit operator bool(IsCompleted isCompleted)
+    {
+        return isCompleted.Value;
+    }
+}
+public record Goals
+{
+    public string Value { get; }
 
-//     private StartedAt(DateTime value)
-//     {
-//         Value = value;
-//     }
+    private Goals(string value)
+    {
+        Value = value;
+    }
 
-//     public static StartedAt Now()
-//     {
-//         return new StartedAt(DateTime.Now);
-//     }
+    public static Goals Of(List<Goal> value)
+    {
+        if (value is null || value.Count == 0)
+        {
+            throw new Exception("List of goals cannot be null or empty");
+        }
 
-//     public static implicit operator DateTime(StartedAt time)
-//     {
-//         return time.Value;
-//     }
-// }
+        string jsonValue = JsonSerializer.Serialize(value);
+        return new Goals(jsonValue);
+    }
 
-// public record FinishedAt
-// {
-//     public DateTime Value { get; }
+    public static Goals Of(string json)
+    {
+        if (string.IsNullOrEmpty(json))
+        {
+            throw new Exception("JSON value cannot be empty");
+        }
 
-//     private FinishedAt(DateTime value)
-//     {
-//         Value = value;
-//     }
+        return new Goals(json);
+    }
 
-//     public static FinishedAt Now()
-//     {
-//         return new FinishedAt(DateTime.Now);
-//     }
+    public static implicit operator string(Goals goals)
+    {
+        return goals.Value;
+    }
 
-//     public static implicit operator DateTime(FinishedAt time)
-//     {
-//         return time.Value;
-//     }
-// }
+    public List<Goal> GetGoals()
+    {
+        var goals = JsonSerializer.Deserialize<List<Goal>>(Value);
+        if (goals is null || goals.Count == 0)
+        {
+            throw new Exception("List of goals cannot be null or empty");
+        }
+        return goals;
+    }
+}
 
-// public enum MissionStatus
-// {
-//     Initiated = 1,
-//     InProgress = 2,
-//     Abandoned = 3,
-//     Completed = 4,
-//     Failed = 5,
-// }
+public record Time
+{
+    public int Value { get; }
+
+    private Time(int value)
+    {
+        Value = value;
+    }
+
+    public static Time Of(int value)
+    {
+        if (value < 0 || value > 60)
+        {
+            throw new Exception();
+        }
+
+        return new Time(value);
+    }
+
+    public static implicit operator int(Time time)
+    {
+        return time.Value;
+    }
+}
+
+public record Squad
+{
+    public string Value { get; }
+
+    private Squad(string value)
+    {
+        Value = value;
+    }
+
+    public static Squad Of(List<Guid> value)
+    {
+        if (value is null || value.Count == 0 || value.Count > 4)
+        {
+            throw new Exception();
+        }
+
+        string jsonValue = JsonSerializer.Serialize(value);
+        return new Squad(jsonValue);
+    }
+
+    public static Squad Of(string json)
+    {
+        if (string.IsNullOrEmpty(json))
+        {
+            throw new Exception("JSON value cannot be empty");
+        }
+
+        return new Squad(json);
+    }
+    public static implicit operator string(Squad squad)
+    {
+        return squad.Value;
+    }
+
+    public List<Guid> GetPlayers()
+    {
+        var res = JsonSerializer.Deserialize<List<Guid>>(Value);
+        if (res is null || res.Count == 0 || res.Count > 4)
+        {
+            throw new Exception();
+        }
+        return res;
+    }
+}
+
+public record StartedAt
+{
+    public DateTime Value { get; }
+
+    private StartedAt(DateTime value)
+    {
+        Value = value;
+    }
+
+    public static StartedAt Now()
+    {
+        return new StartedAt(DateTime.Now);
+    }
+
+    public static implicit operator DateTime(StartedAt time)
+    {
+        return time.Value;
+    }
+}
+
+public record FinishedAt
+{
+    public DateTime Value { get; }
+
+    private FinishedAt(DateTime value)
+    {
+        Value = value;
+    }
+
+    public static FinishedAt Now()
+    {
+        return new FinishedAt(DateTime.Now);
+    }
+
+    public static implicit operator DateTime(FinishedAt time)
+    {
+        return time.Value;
+    }
+}
+
+public enum MissionStatus
+{
+    Initiated = 1,
+    InProgress = 2,
+    Abandoned = 3,
+    Completed = 4,
+    Failed = 5,
+}
