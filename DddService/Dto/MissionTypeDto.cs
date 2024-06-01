@@ -6,6 +6,6 @@ public record MissionTypeDto(string Id, string Name, string Description, IEnumer
 {
     public static MissionTypeDto From(MissionType missionType)
     {
-        return new MissionTypeDto(missionType.Id.ToString(), missionType.Name.Value, missionType.Description.Value, missionType.Goals.GetGoals());
+        return new MissionTypeDto(missionType.Id.ToString(), missionType.Name, missionType.Description, missionType.Goals.GetGoals());
     }
 }

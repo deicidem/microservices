@@ -24,19 +24,19 @@ public class CreateMissionCommandHandler : IRequestHandler<CreateMissionCommand,
 
     public async Task<MissionDto> Handle(CreateMissionCommand request, CancellationToken cancellationToken)
     {
-        var missionType = await _db.MissionTypes.FirstOrDefaultAsync(p => p.Id == Guid.Parse(request.MissionTypeId));
+        var missionType = await _db.MissionTypes.FirstOrDefaultAsync(p => p.Id == Guid.Parse(request.MissionTypeId), cancellationToken: cancellationToken);
         if (missionType is null)
         {
             throw new Exception();
         }
 
-        var commandCenter = await _db.CommandCenters.Include(c => c.Player).FirstOrDefaultAsync(p => p.Id == Guid.Parse(request.CommandCenterId));
+        var commandCenter = await _db.CommandCenters.Include(c => c.Player).FirstOrDefaultAsync(p => p.Id == Guid.Parse(request.CommandCenterId), cancellationToken: cancellationToken);
         if (commandCenter is null)
         {
             throw new Exception();
         }
 
-        var planet = await _db.Planets.FirstOrDefaultAsync(p => p.Id == Guid.Parse(request.PlanetId));
+        var planet = await _db.Planets.FirstOrDefaultAsync(p => p.Id == Guid.Parse(request.PlanetId), cancellationToken: cancellationToken);
         if (planet is null)
         {
             throw new Exception();
@@ -44,7 +44,7 @@ public class CreateMissionCommandHandler : IRequestHandler<CreateMissionCommand,
 
 
         var mission = commandCenter.InitiateMission(missionType, request.Difficulty, planet);
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(cancellationToken);
 
         return MissionDto.From(mission);
 

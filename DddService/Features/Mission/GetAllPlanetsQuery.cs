@@ -19,6 +19,6 @@ public class GetAllPlanetsQueryHandler : IRequestHandler<GetAllPlanetsQuery, ILi
 
     public async Task<IList<PlanetDto>> Handle(GetAllPlanetsQuery request, CancellationToken cancellationToken)
     {
-        return await _db.Planets.Select(p => PlanetDto.From(p)).ToListAsync();
+        return await _db.Planets.Select(p => PlanetDto.From(p)).ToListAsync(cancellationToken: cancellationToken);
     }
 }

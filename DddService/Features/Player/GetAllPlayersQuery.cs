@@ -18,6 +18,6 @@ public class GetAllPlayersQueryHandler : IRequestHandler<GetAllPlayersQuery, ILi
 
     public async Task<IList<PlayerDto>> Handle(GetAllPlayersQuery request, CancellationToken cancellationToken)
     {
-        return await _db.Players.Select(p => PlayerDto.From(p)).ToListAsync();
+        return await _db.Players.Select(p => PlayerDto.From(p)).ToListAsync(cancellationToken: cancellationToken);
     }
 }

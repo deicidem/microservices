@@ -100,42 +100,23 @@ app.MapGet("api/mission-types", async (IMediator mediator) =>
     return await mediator.Send(new GetAllMissionTypesQuery());
 });
 
-app.MapPost("api/command-center/{commandCenterId}/mission/initiate", async (string commandCenterId, MissionInitiateModel missionInitiate, HelldiversDbContext db, IMediator mediator) =>
+app.MapPost("api/command-center/{commandCenterId}/mission/initiate", async (string commandCenterId, MissionInitiateModel missionInitiate, IMediator mediator) =>
 {
     var command = new CreateMissionCommand(commandCenterId, missionInitiate.MissionTypeId, missionInitiate.PlanetId, missionInitiate.Difficulty);
     var response = await mediator.Send(command);
     return Results.Created($"api/missions/{response.Id}", response);
 });
 
-app.MapPost("api/command-center/{commandCenterId}/mission/search", async (string commandCenterId, HelldiversDbContext db) =>
+app.MapPost("api/command-center/{commandCenterId}/mission/search", async (string commandCenterId, IMediator mediator) =>
 {
-    var commandCenter = await db.CommandCenters.FirstOrDefaultAsync(p => p.Id == Guid.Parse(commandCenterId));
-    if (commandCenter is null)
-    {
-        return Results.NotFound();
-    }
-
-    var missions = await db.Missions.ToListAsync();
-    var mission = commandCenter.SearchForMission(missions);
-
-    await db.SaveChangesAsync();
-
-    return Results.Ok();
+    var command = new SearchForMissionCommand(commandCenterId);
+    return await mediator.Send(command);
 });
 
-app.MapPost("api/command-center/{commandCenterId}/mission/start", async (string commandCenterId, HelldiversDbContext db) =>
+app.MapPost("api/command-center/{commandCenterId}/mission/start", async (string commandCenterId, IMediator mediator) =>
 {
-    var commandCenter = await db.CommandCenters.FirstOrDefaultAsync(p => p.Id == Guid.Parse(commandCenterId));
-    if (commandCenter is null)
-    {
-        return Results.NotFound();
-    }
-
-    commandCenter.StartMission();
-
-    await db.SaveChangesAsync();
-
-    return Results.Ok();
+    var command = new StartMissionCommand(commandCenterId);
+    return await mediator.Send(command);
 });
 
 app.MapPost("api/command-center/{commandCenterId}/mission/abandon", async (string commandCenterId, HelldiversDbContext db) =>

@@ -5,9 +5,8 @@ using DddService.Common;
 
 namespace DddService.Aggregates.CommandCenterNamespace;
 
-public class CommandCenter
+public class CommandCenter : Aggregate
 {
-    public Guid Id { get; set; } = default!;
     public virtual Player Player { get; set; } = default!;
     public Guid PlayerId { get; set; } = default!;
     public Mission? Mission { get; set; } = default!;
@@ -20,6 +19,7 @@ public class CommandCenter
             Id = id,
             Player = player,
             HighestDifficultyAvailable = Difficulty.Easy,
+            IsDeleted = false
         };
     }
     public Mission InitiateMission(MissionType missionType, Difficulty difficulty, Planet planet)

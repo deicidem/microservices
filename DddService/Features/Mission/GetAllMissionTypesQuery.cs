@@ -19,6 +19,6 @@ public class GetAllMissionTypesQueryHandler : IRequestHandler<GetAllMissionTypes
 
     public async Task<IList<MissionTypeDto>> Handle(GetAllMissionTypesQuery request, CancellationToken cancellationToken)
     {
-        return await _db.MissionTypes.Select(mt => MissionTypeDto.From(mt)).ToListAsync();
+        return await _db.MissionTypes.Select(mt => MissionTypeDto.From(mt)).ToListAsync(cancellationToken: cancellationToken);
     }
 }

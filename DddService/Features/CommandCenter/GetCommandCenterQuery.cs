@@ -18,7 +18,7 @@ public class GetCommandCenterByIdQueryHandler : IRequestHandler<GetCommandCenter
 
     public async Task<CommandCenterDto> Handle(GetCommandCenterByIdQuery request, CancellationToken cancellationToken)
     {
-        var commandCenter = await _db.CommandCenters.FirstOrDefaultAsync(p => p.PlayerId == Guid.Parse(request.playerId));
+        var commandCenter = await _db.CommandCenters.FirstOrDefaultAsync(p => p.PlayerId == Guid.Parse(request.playerId), cancellationToken: cancellationToken);
         if (commandCenter is null)
         {
             throw new Exception();

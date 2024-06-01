@@ -9,7 +9,7 @@ POST {{base_address}}/api/players
 Content-Type: application/json
 
 {
-  "nickname": "deicidem"
+  "nickname": "test 4"
 }
 
 ###
@@ -22,9 +22,14 @@ GET {{base_address}}/api/planets
 GET {{base_address}}/api/mission-types
 
 ###
-POST {{base_address}}/api/command-center/{{command_center_id}}/mission/initiate?missionTypeId={{mission_type_id}}&planetId={{planet_id}}&difficulty=1
+POST {{base_address}}/api/command-center/{{command_center_id}}/mission/initiate
 Content-Type: application/json
 
 {
-  "nickname": "deicidem"
+  "missionTypeId": "{{mission_type_id}}",
+  "planetId": "{{planet_id}}",
+  "difficulty": 1
 }
+
+###
+POST {{base_address}}/api/command-center/{{command_center_id}}/mission/search

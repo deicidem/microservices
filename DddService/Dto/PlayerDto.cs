@@ -2,7 +2,7 @@
 
 namespace DddService.Dto;
 
-public record PlayerDto(string Id, string Nickname, int Credits, int Experience, string Rank)
+public record PlayerDto(string Id, string Nickname, int Credits, int Experience, string Rank, string CommandCenterId)
 {
     public static PlayerDto From(Player player)
     {
@@ -11,7 +11,8 @@ public record PlayerDto(string Id, string Nickname, int Credits, int Experience,
             player.Nickname.Value,
             player.Credits.Value,
             player.Experience.Value,
-            player.Rank.Value
+            player.Rank.Value,
+            player.CommandCenterId.ToString()
         );
     }
 };

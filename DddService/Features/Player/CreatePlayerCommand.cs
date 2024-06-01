@@ -25,7 +25,7 @@ public class CreatePlayerCommandHandler : IRequestHandler<CreatePlayerCommand, P
 
     public async Task<PlayerDto> Handle(CreatePlayerCommand request, CancellationToken cancellationToken)
     {
-        var player = await _db.Players.SingleOrDefaultAsync(x => x.Nickname.Value == request.Nickname);
+        var player = await _db.Players.SingleOrDefaultAsync(x => x.Nickname.Value == request.Nickname, cancellationToken: cancellationToken);
         if (player is not null)
         {
             throw new Exception();
@@ -36,19 +36,19 @@ public class CreatePlayerCommandHandler : IRequestHandler<CreatePlayerCommand, P
             Nickname.Of(request.Nickname)
         );
         var PlayerEntity = _db.Players.Add(newPlayer).Entity;
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(cancellationToken);
 
         var newCommandCenter = CommandCenter.Create(
             Guid.NewGuid(),
             newPlayer
         );
         newCommandCenter = _db.CommandCenters.Add(newCommandCenter).Entity;
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(cancellationToken);
 
 
         PlayerEntity.ConnectToCommandCenter(newCommandCenter);
 
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(cancellationToken);
 
         return PlayerDto.From(PlayerEntity);
     }

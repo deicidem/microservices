@@ -141,6 +141,10 @@ public class Mission : Aggregate
 
     public void AddToSquad(Player player)
     {
+        if (Squad.GetPlayers().Count >= 4)
+        {
+            throw new Exception();
+        }
         Squad = Squad.Of([.. Squad.GetPlayers(), player.Id]);
     }
 
