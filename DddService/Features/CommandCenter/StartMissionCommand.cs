@@ -1,5 +1,6 @@
 using DddService.Aggregates;
 using DddService.Aggregates.MissionNamespace;
+using DddService.Database;
 using DddService.Dto;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;

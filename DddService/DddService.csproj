@@ -15,4 +15,35 @@
       <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="RewardSystem\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="RewardSystem\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="RewardSystem\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="RewardSystem\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="RewardSystem\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="RewardSystem\appsettings.json" />
+      <_ContentIncludedByDefault Remove="RewardSystem\bin\Debug\net8.0\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="RewardSystem\bin\Debug\net8.0\appsettings.json" />
+      <_ContentIncludedByDefault Remove="RewardSystem\bin\Debug\net8.0\RewardSystem.deps.json" />
+      <_ContentIncludedByDefault Remove="RewardSystem\bin\Debug\net8.0\RewardSystem.runtimeconfig.json" />
+      <_ContentIncludedByDefault Remove="RewardSystem\obj\Debug\net8.0\RewardSystem.sourcelink.json" />
+      <_ContentIncludedByDefault Remove="RewardSystem\obj\Debug\net8.0\staticwebassets.build.json" />
+      <_ContentIncludedByDefault Remove="RewardSystem\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="RewardSystem\obj\project.packagespec.json" />
+      <_ContentIncludedByDefault Remove="RewardSystem\obj\RewardSystem.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="RewardSystem\Properties\launchSettings.json" />
+    </ItemGroup>
+
 </Project>

@@ -103,9 +103,19 @@ public class CommandCenter : Aggregate
         Mission.Finish(MissionStatus.Completed);
     }
 
+    public void RewardPlayer(Credits credits, Experience experience, Difficulty difficulty)
+    {
+        Player.EarnCredits(credits);
+        Player.GainExperience(experience);
+        UpdateHighestDifficultyAvailable(difficulty);
+    }
+
     public void UpdateHighestDifficultyAvailable(Difficulty difficulty)
     {
-        HighestDifficultyAvailable = difficulty;
+        if (difficulty == HighestDifficultyAvailable && difficulty != Difficulty.Hell)
+        {
+            HighestDifficultyAvailable = difficulty + 1;
+        }
     }
 
 

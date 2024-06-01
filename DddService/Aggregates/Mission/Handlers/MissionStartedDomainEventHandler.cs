@@ -18,6 +18,6 @@ public class MissionStartedDomainEventHandler : INotificationHandler<MissionStar
     {
         var missionStartedMessage = new MissionStartedMessage(notification.Id, notification.Difficulty.GetDisplayName(), notification.Status.GetDisplayName(), notification.Reinforcements, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString());
         Console.WriteLine($"Mission has been Started at {DateTime.Now}: " + JsonSerializer.Serialize(missionStartedMessage));
-        await _kafkaProducerService.ProduceAsync("NewMissionStarted", JsonSerializer.Serialize(missionStartedMessage));
+        await _kafkaProducerService.ProduceAsync("MissionStarted", JsonSerializer.Serialize(missionStartedMessage));
     }
 }

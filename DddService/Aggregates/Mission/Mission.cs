@@ -176,6 +176,8 @@ public class Mission : Aggregate
             throw new Exception();
         }
 
+        UpdateStatus(MissionStatus.InProgress);
+
         var @event = new MissionStartedDomainEvent(
             Id,
             Difficulty,
@@ -184,8 +186,6 @@ public class Mission : Aggregate
         );
 
         AddDomainEvent(@event);
-
-        UpdateStatus(MissionStatus.InProgress);
     }
 
     public void Finish(MissionStatus status)
@@ -201,6 +201,16 @@ public class Mission : Aggregate
         }
 
         UpdateStatus(status);
+
+        var @event = new MissionCompletedDomainEvent(
+            Id,
+            Difficulty,
+            Status,
+            Reinforcements,
+            Squad.GetPlayers()
+        );
+
+        AddDomainEvent(@event);
     }
 
     private void UpdateStatus(MissionStatus status)

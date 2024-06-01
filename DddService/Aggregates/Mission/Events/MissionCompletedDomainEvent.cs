@@ -7,5 +7,6 @@ public record MissionCompletedDomainEvent(
     Guid Id,
     Difficulty Difficulty,
     MissionStatus Status,
-    int Reinforcements
+    int Reinforcements,
+    List<Guid> Squad
 ) : IDomainEvent;
