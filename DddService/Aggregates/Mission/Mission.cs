@@ -157,7 +157,7 @@ public class Mission : Aggregate
         else
         {
             Squad = Squad.Of([.. Squad.GetPlayers().Where(x => x != player.Id)]);
-            if (Initiator.Id.Equals(player.Id))
+            if (InitiatorId.Equals(player.Id))
             {
                 InitiatorId = Squad.GetPlayers().First();
             }
@@ -175,6 +175,15 @@ public class Mission : Aggregate
         {
             throw new Exception();
         }
+
+        var @event = new MissionStartedDomainEvent(
+            Id,
+            Difficulty,
+            Status,
+            Reinforcements
+        );
+
+        AddDomainEvent(@event);
 
         UpdateStatus(MissionStatus.InProgress);
     }

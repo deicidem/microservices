@@ -119,18 +119,10 @@ app.MapPost("api/command-center/{commandCenterId}/mission/start", async (string 
     return await mediator.Send(command);
 });
 
-app.MapPost("api/command-center/{commandCenterId}/mission/abandon", async (string commandCenterId, HelldiversDbContext db) =>
+app.MapPost("api/command-center/{commandCenterId}/mission/abandon", async (string commandCenterId, IMediator mediator) =>
 {
-    var commandCenter = await db.CommandCenters.Include(c => c.Player).FirstOrDefaultAsync(p => p.Id == Guid.Parse(commandCenterId));
-    if (commandCenter is null)
-    {
-        return Results.NotFound();
-    }
-
-    commandCenter.AbandonMission();
-
-    await db.SaveChangesAsync();
-
+    var command = new AbandonMissionCommand(commandCenterId);
+    await mediator.Send(command);
     return Results.Ok();
 });
 

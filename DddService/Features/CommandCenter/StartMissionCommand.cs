@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace DddService.Features.MissionFeature;
+namespace DddService.Features.CommandCenterFeature;
 
 public record StartMissionCommand(string CommandCenterId) : IRequest<MissionDto>
 {

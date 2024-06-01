@@ -62,6 +62,7 @@ public class CommandCenter : Aggregate
         }
 
         Mission.RemoveFromSquad(Player);
+        MissionId = null;
     }
 
     public Mission SearchForMission(IEnumerable<Mission> missions)
@@ -101,8 +102,6 @@ public class CommandCenter : Aggregate
 
         Mission.Finish(MissionStatus.Completed);
     }
-
-
 
     public void UpdateHighestDifficultyAvailable(Difficulty difficulty)
     {
