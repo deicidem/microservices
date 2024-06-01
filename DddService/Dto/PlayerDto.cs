@@ -1,4 +1,18 @@
-﻿namespace DddService.Dto;
+﻿using DddService.Aggregates.PlayerNamespace;
 
-public record PlayerDto(string Id, string Nickname, int Credits, int Experience, string Rank);
+namespace DddService.Dto;
+
+public record PlayerDto(string Id, string Nickname, int Credits, int Experience, string Rank)
+{
+    public static PlayerDto From(Player player)
+    {
+        return new PlayerDto(
+            player.Id.ToString(),
+            player.Nickname.Value,
+            player.Credits.Value,
+            player.Experience.Value,
+            player.Rank.Value
+        );
+    }
+};
 public record PlayerInputModel(string Nickname);

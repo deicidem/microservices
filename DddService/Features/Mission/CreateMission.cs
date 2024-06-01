@@ -1,19 +1,19 @@
 using DddService.Aggregates;
 using DddService.Aggregates.MissionNamespace;
+using DddService.Dto;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace DddService.Features.CreatingMission;
+namespace DddService.Features.MissionFeature;
 
-public record CreateMissionCommand(string CommandCenterId, string MissionTypeId, string PlanetId, Difficulty Difficulty) : IRequest<CreateMissionResult>
+public record CreateMissionCommand(string CommandCenterId, string MissionTypeId, string PlanetId, Difficulty Difficulty) : IRequest<MissionDto>
 {
 }
 
-public record CreateMissionResult(Guid Id);
 
-public class CreateMissionCommandHandler : IRequestHandler<CreateMissionCommand, CreateMissionResult>
+public class CreateMissionCommandHandler : IRequestHandler<CreateMissionCommand, MissionDto>
 {
     private readonly HelldiversDbContext _db;
 
@@ -22,7 +22,7 @@ public class CreateMissionCommandHandler : IRequestHandler<CreateMissionCommand,
         _db = db;
     }
 
-    public async Task<CreateMissionResult> Handle(CreateMissionCommand request, CancellationToken cancellationToken)
+    public async Task<MissionDto> Handle(CreateMissionCommand request, CancellationToken cancellationToken)
     {
         var missionType = await _db.MissionTypes.FirstOrDefaultAsync(p => p.Id == Guid.Parse(request.MissionTypeId));
         if (missionType is null)
@@ -44,10 +44,9 @@ public class CreateMissionCommandHandler : IRequestHandler<CreateMissionCommand,
 
 
         var mission = commandCenter.InitiateMission(missionType, request.Difficulty, planet);
-
         await _db.SaveChangesAsync();
 
-        return new CreateMissionResult(mission.Id);
+        return MissionDto.From(mission);
 
     }
 }

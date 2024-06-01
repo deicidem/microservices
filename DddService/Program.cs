@@ -6,7 +6,9 @@ using DddService.Aggregates.PlayerNamespace;
 using DddService.Common;
 using DddService.Dto;
 using DddService.EventBus;
-using DddService.Features.CreatingMission;
+using DddService.Features.CommandCenterFeature;
+using DddService.Features.MissionFeature;
+using DddService.Features.PlayerFeature;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
@@ -70,96 +72,39 @@ void SeedData(IHost app)
 }
 
 
-app.MapPost("api/players", async (PlayerInputModel model, HelldiversDbContext db) =>
+app.MapPost("api/players", async (PlayerInputModel model, IMediator mediator) =>
 {
-    var Player = await db.Players.SingleOrDefaultAsync(x => x.Nickname.Value == model.Nickname);
-    if (Player is not null)
-    {
-        return Results.BadRequest("Player with this nickname already exist!");
-    }
+    var command = new CreatePlayerCommand(model.Nickname);
+    var response = await mediator.Send(command);
 
-    var newPlayer = Player.Create(
-        Guid.NewGuid(),
-        Nickname.Of(model.Nickname)
-    );
-    var PlayerEntity = db.Players.Add(newPlayer).Entity;
-    await db.SaveChangesAsync();
-
-    var newCommandCenter = CommandCenter.Create(
-        Guid.NewGuid(),
-        newPlayer
-    );
-    newCommandCenter = db.CommandCenters.Add(newCommandCenter).Entity;
-    await db.SaveChangesAsync();
-
-
-    PlayerEntity.ConnectToCommandCenter(newCommandCenter);
-
-    await db.SaveChangesAsync();
-
-    return Results.Created($"api/Players/{PlayerEntity.Id}", new PlayerDto(
-        PlayerEntity.Id.ToString(),
-        PlayerEntity.Nickname.Value,
-        PlayerEntity.Credits.Value,
-        PlayerEntity.Experience.Value,
-        PlayerEntity.Rank.Value
-    ));
+    return Results.Created($"api/players/{response.Id}", response);
 });
 
-app.MapGet("api/players", async (HelldiversDbContext db) =>
+app.MapGet("api/players", async (IMediator mediator) =>
 {
-    return await db.Players.Select(a => new PlayerDto(
-        a.Id.ToString(),
-        a.Nickname.Value,
-        a.Credits.Value,
-        a.Experience.Value,
-        a.Rank.Value
-    ))
-    .ToListAsync();
+    return await mediator.Send(new GetAllPlayersQuery());
 });
 
-app.MapGet("api/command-center", async (string playerId, HelldiversDbContext db) =>
+app.MapGet("api/command-center", async (string playerId, IMediator mediator) =>
 {
-    var commandCenter = await db.CommandCenters.FirstOrDefaultAsync(p => p.PlayerId == Guid.Parse(playerId));
-    if (commandCenter is null)
-    {
-        return Results.NotFound();
-    }
-
-    return Results.Json(new CommandCenterDto(
-        commandCenter.Id.ToString(),
-        commandCenter.PlayerId.ToString(),
-        commandCenter.MissionId?.ToString(),
-        commandCenter.HighestDifficultyAvailable.ToString()
-    ));
-
+    return await mediator.Send(new GetCommandCenterByIdQuery(playerId));
 });
 
-app.MapGet("api/planets", async (HelldiversDbContext db) =>
+app.MapGet("api/planets", async (IMediator mediator) =>
 {
-    return await db.Planets.Select(p => new PlanetDto(
-        p.Id.ToString(),
-        p.Name.Value,
-        p.Status.GetDisplayName(),
-        p.Progress.Value
-    )).ToListAsync();
+    return await mediator.Send(new GetAllPlanetsQuery());
 });
 
-app.MapGet("api/mission-types", async (HelldiversDbContext db) =>
+app.MapGet("api/mission-types", async (IMediator mediator) =>
 {
-    return await db.MissionTypes.Select(p => new MissionTypeDto(
-        p.Id.ToString(),
-        p.Name.Value,
-        p.Description.Value,
-        p.Goals.GetGoals()
-    )).ToListAsync();
+    return await mediator.Send(new GetAllMissionTypesQuery());
 });
 
 app.MapPost("api/command-center/{commandCenterId}/mission/initiate", async (string commandCenterId, MissionInitiateModel missionInitiate, HelldiversDbContext db, IMediator mediator) =>
 {
     var command = new CreateMissionCommand(commandCenterId, missionInitiate.MissionTypeId, missionInitiate.PlanetId, missionInitiate.Difficulty);
     var response = await mediator.Send(command);
-    return Results.Ok();
+    return Results.Created($"api/missions/{response.Id}", response);
 });
 
 app.MapPost("api/command-center/{commandCenterId}/mission/search", async (string commandCenterId, HelldiversDbContext db) =>
