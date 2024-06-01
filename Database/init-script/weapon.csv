@@ -1,0 +1,4 @@
+id,name,type,damage,fire_rate,ammunition
+1,Liberator,Rifle,50,600,100
+2,Destroyer,Shotgun,100,300,20
+3,Defender,Rifle,70,500,60

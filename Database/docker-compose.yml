@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  postgres_master:
+    container_name: postgres_master
+    image: postgres:latest
+    restart: always
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - ./init-script/createdb.sql:/docker-entrypoint-initdb.d/createdb.sql
+      - ./data-slave:/var/lib/postgresql/data-slave
+      - ./init-script:/etc/postgresql/init-script
+      - ./init-script/config/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./init-script/config/postgres.conf:/etc/postgresql/postgresql.conf
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_DB=helldivers
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  # postgres_slave:
+  #   container_name: postgres_slave
+  #   image: postgres:latest
+  #   restart: always
+  #   volumes:
+  #     - ./data-slave:/var/lib/postgresql/data
+  #     - ./init-script/config/pg_hba.conf:/etc/postgresql/pg_hba.conf
+  #     - ./init-script/config/postgres.conf:/etc/postgresql/postgresql.conf
+  #   ports:
+  #     - 5432
+  #   environment:
+  #     - POSTGRES_DB=helldivers
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=postgres
+  # pgpool:
+  #   container_name: pgpool
+  #   image: bitnami/pgpool:4.5.1
+  #   ports:
+  #     - 5433:5432
+  #   depends_on:
+  #     - postgres_master
+  #     - postgres_slave
+  #   environment:
+  #     - PGPOOL_BACKEND_NODES=0:postgres_master:5432:4:primary:ALWAYS_PRIMARY,1:postgres_slave:5432:6:replica
+  #     - PGPOOL_POSTGRES_USERNAME=postgres
+  #     - PGPOOL_POSTGRES_PASSWORD=postgres
+  #     - PGPOOL_ADMIN_USERNAME=admin
+  #     - PGPOOL_ADMIN_PASSWORD=admin
+  #     - PGPOOL_ENABLE_LOAD_BALANCING=yes
+  #     - PGPOOL_ENABLE_STATEMENT_LOAD_BALANCING=yes
+  #     - PGPOOL_NUM_INIT_CHILDREN=10
+  #     - PGPOOL_MAX_POOL=1
+  #     - PGPOOL_SR_CHECK_USER=postgres
+  #     - PGPOOL_SR_CHECK_PASSWORD=postgres

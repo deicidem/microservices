@@ -1,0 +1,4 @@
+id,name,mission_type,difficulty_id,initiator_id,planet_id
+1,Rescue Mission,Rescue,2,1,2
+2,Infiltration Operation,Infiltration,3,2,1
+3,Defense Assignment,Defense,1,3,3
