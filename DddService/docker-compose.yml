@@ -118,3 +118,7 @@ services:
       BI_DATA_ENDPOINT: "http://data-api:8080"
       NODE_EXTRA_CA_CERTS: "/usr/local/share/ca-certificates/cert.pem"
       HC: 1
+  consumer:
+    build: ./Dockerfile
+    depends_on:
+      - broker

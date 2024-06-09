@@ -25,8 +25,10 @@ builder.Services.AddDbContext<HelldiversDbContext>(options =>
     options.UseNpgsql("Host=localhost;Port=5433;Database=helldivers;Username=postgres;Password=postgres",
         b => b.MigrationsAssembly("DddService"));
 });
-builder.Services.AddSingleton<KafkaProducerService>();
+
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+builder.Services.AddSingleton<KafkaProducerService>();
+builder.Services.AddHostedService<RewardGrantedConsumerService>();
 var app = builder.Build();
 builder.Services.AddLogging(e => e.AddConsole());
 if (app.Environment.IsDevelopment())
@@ -36,7 +38,8 @@ if (app.Environment.IsDevelopment())
 }
 
 SeedData(app);
-
+// var RewardGrantedConsumerService = app.Services.GetRequiredService<IHostedService>();
+// await RewardGrantedConsumerService.StartAsync(default);
 // Seed data
 void SeedData(IHost app)
 {
@@ -128,3 +131,8 @@ app.MapPost("api/command-center/{commandCenterId}/mission/abandon", async (strin
 });
 
 app.Run();
+// var consumer = app.Services.GetService<RewardGrantedConsumerService>();
+// Task.Run(async () =>
+// {
+//     await consumer.StartAsync(CancellationToken.None);
+// });

@@ -16,7 +16,7 @@ public class MissionCompleteedDomainEventHandler : INotificationHandler<MissionC
 
     public async Task Handle(MissionCompletedDomainEvent notification, CancellationToken cancellationToken)
     {
-        var missionCompleteedMessage = new MissionCompletedMessage(notification.Id, notification.Difficulty.GetDisplayName(), notification.Status.GetDisplayName(), notification.Reinforcements, notification.Squad, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString());
+        var missionCompleteedMessage = new MissionCompletedMessage(notification.Id, notification.Difficulty, notification.Status.GetDisplayName(), notification.Reinforcements, notification.Squad, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString());
 
         Console.WriteLine($"Mission has been Completed at {DateTime.Now}: " + JsonSerializer.Serialize(missionCompleteedMessage));
 

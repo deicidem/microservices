@@ -1,6 +1,8 @@
 @base_address = http://localhost:5027
 @player_id = c757fab8-afea-4dc1-8249-eafd1a660d79
 @command_center_id = 4d9adb07-1c7a-4a38-8683-cf47d7fdf323
+@command_center_2_id = 0044ca65-caf7-4c57-87b1-c9b5594c1b27
+
 @planet_id = 6689c49f-d467-415c-ac15-e7557b9a11ad
 @mission_type_id = 72cd0913-ea27-4741-b472-988eb8ed3634
 GET {{base_address}}/api/players
@@ -32,4 +34,13 @@ Content-Type: application/json
 }
 
 ###
-POST {{base_address}}/api/command-center/{{command_center_id}}/mission/search
+POST {{base_address}}/api/command-center/{{command_center_2_id}}/mission/search
+
+###
+POST {{base_address}}/api/command-center/{{command_center_id}}/mission/start
+
+###
+POST {{base_address}}/api/command-center/{{command_center_id}}/mission/abandon
+
+###
+POST {{base_address}}/api/command-center/{{command_center_2_id}}/mission/abandon
