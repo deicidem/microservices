@@ -24,7 +24,7 @@ builder.Services.AddDbContext<HelldiversDbContext>(options =>
 {
     options.UseNpgsql("Host=localhost;Port=5433;Database=helldivers;Username=postgres;Password=postgres",
         b => b.MigrationsAssembly("DddService"));
-});
+}, ServiceLifetime.Transient);
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 builder.Services.AddSingleton<KafkaProducerService>();
@@ -38,6 +38,7 @@ if (app.Environment.IsDevelopment())
 }
 
 SeedData(app);
+var mediator = app.Services.GetRequiredService<IMediator>();
 // var RewardGrantedConsumerService = app.Services.GetRequiredService<IHostedService>();
 // await RewardGrantedConsumerService.StartAsync(default);
 // Seed data
@@ -121,6 +122,13 @@ app.MapPost("api/command-center/{commandCenterId}/mission/start", async (string 
 {
     var command = new StartMissionCommand(commandCenterId);
     return await mediator.Send(command);
+});
+
+app.MapPost("api/command-center/{commandCenterId}/mission/complete-objective", async (string commandCenterId, IMediator mediator) =>
+{
+    var command = new CompleteObjectiveCommand(commandCenterId);
+    await mediator.Send(command);
+    return Results.Ok();
 });
 
 app.MapPost("api/command-center/{commandCenterId}/mission/abandon", async (string commandCenterId, IMediator mediator) =>

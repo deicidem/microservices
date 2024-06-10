@@ -9,21 +9,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DddService.Features.CommandCenterFeature;
 
-public record AbandonMissionCommand(string CommandCenterId) : IRequest
+public record CompleteObjectiveCommand(string CommandCenterId) : IRequest
 {
 }
 
 
-public class AbandonMissionCommandHandler : IRequestHandler<AbandonMissionCommand>
+public class CompleteObjectiveCommandHandler : IRequestHandler<CompleteObjectiveCommand>
 {
     private readonly HelldiversDbContext _db;
 
-    public AbandonMissionCommandHandler(HelldiversDbContext db)
+    public CompleteObjectiveCommandHandler(HelldiversDbContext db)
     {
         _db = db;
     }
 
-    public async Task Handle(AbandonMissionCommand request, CancellationToken cancellationToken)
+    public async Task Handle(CompleteObjectiveCommand request, CancellationToken cancellationToken)
     {
 
         var commandCenter = await _db.CommandCenters.Include(x => x.Player).Include(x => x.Mission).ThenInclude(x => x.Objectives)
@@ -32,8 +32,12 @@ public class AbandonMissionCommandHandler : IRequestHandler<AbandonMissionComman
         {
             throw new Exception();
         }
+        if (commandCenter.Mission is null)
+        {
+            throw new Exception();
+        }
 
-        commandCenter.AbandonMission();
+        commandCenter.Mission.CompleteObjective();
 
         await _db.SaveChangesAsync(cancellationToken);
     }

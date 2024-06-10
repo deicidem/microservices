@@ -30,7 +30,7 @@ Content-Type: application/json
 {
   "missionTypeId": "{{mission_type_id}}",
   "planetId": "{{planet_id}}",
-  "difficulty": 1
+  "difficulty": 4
 }
 
 ###
@@ -38,6 +38,12 @@ POST {{base_address}}/api/command-center/{{command_center_2_id}}/mission/search
 
 ###
 POST {{base_address}}/api/command-center/{{command_center_id}}/mission/start
+
+###
+POST {{base_address}}/api/command-center/{{command_center_id}}/mission/complete-objective
+
+###
+POST {{base_address}}/api/command-center/{{command_center_2_id}}/mission/complete-objective
 
 ###
 POST {{base_address}}/api/command-center/{{command_center_id}}/mission/abandon

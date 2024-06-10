@@ -4,8 +4,9 @@ namespace Messages;
 
 public record MissionStartedMessage(
     Guid Id,
-    string Difficulty,
+    Difficulty Difficulty,
     string Status,
     int Reinforcements,
+    List<Guid> Squad,
     string Timestamp
 );

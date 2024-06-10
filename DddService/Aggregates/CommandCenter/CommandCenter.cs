@@ -89,22 +89,12 @@ public class CommandCenter : Aggregate
         return mission;
     }
 
-    public void FinishMission()
-    {
-        if (Mission == null)
-        {
-            throw new Exception();
-        }
-        if (!Player.Id.Equals(Mission.InitiatorId))
-        {
-            throw new Exception();
-        }
-
-        Mission.Finish(MissionStatus.Completed);
-    }
-
     public void RewardPlayer(Credits credits, Experience experience, Difficulty difficulty)
     {
+        if (MissionId != null)
+        {
+            MissionId = null;
+        }
         Player.EarnCredits(credits);
         Player.GainExperience(experience);
         UpdateHighestDifficultyAvailable(difficulty);

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.ComponentModel.DataAnnotations.Schema;
 using DddService.Aggregates.CommandCenterNamespace;
+using DddService.Aggregates.MissionNamespace;
 using DddService.Common;
 
 namespace DddService.Aggregates.PlayerNamespace;
@@ -36,6 +37,7 @@ public class Player : Aggregate
             Experience = experience,
             CommandCenter = commandCenter,
             CommandCenterId = commandCenterId,
+            IsDeleted = isDeleted
         };
     }
     public static Player Create(Guid id, Nickname name)
@@ -66,6 +68,7 @@ public class Player : Aggregate
     public void GainExperience(Experience experience)
     {
         Experience = Experience.Of(Experience.Value + experience.Value);
+        Rank = Rank.Of(Experience.Value);
     }
     public void ConnectToCommandCenter(CommandCenter commandCenter)
     {

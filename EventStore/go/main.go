@@ -13,12 +13,13 @@ import (
 )
 
 type MissionCompleted struct {
-	Id             string   `json:"Id"`
-	Difficulty     int      `json:"Difficulty"`
-	Status         string   `json:"Status"`
-	Reinforcements int      `json:"Reinforcements"`
-	Squad          []string `json:"Squad"`
-	Timestamp      string   `json:"Timestamp"`
+	Id                  string   `json:"Id"`
+	Difficulty          int      `json:"Difficulty"`
+	Status              string   `json:"Status"`
+	Reinforcements      int      `json:"Reinforcements"`
+	ObjectivesCompleted int      `json:"ObjectivesCompleted"`
+	Squad               []string `json:"Squad"`
+	Timestamp           string   `json:"Timestamp"`
 }
 
 type Reward struct {
@@ -86,6 +87,8 @@ func main() {
 						Experience: 100,
 						Credits:    100,
 					}
+					reward.Experience = reward.Experience + message.Difficulty*100 + message.Reinforcements*10 + message.ObjectivesCompleted*50
+					reward.Credits = reward.Credits + message.Difficulty*10 + message.Reinforcements + message.ObjectivesCompleted*50
 					for i := 0; i < len(message.Squad); i++ {
 						rewardMessage := RewardGranted{
 							PlayerId:   message.Squad[i],

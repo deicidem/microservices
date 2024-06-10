@@ -29,6 +29,7 @@ public class RewardPlayerCommandHandler : IRequestHandler<RewardPlayerCommand>
 
         var commandCenter = await _db.CommandCenters.Include(x => x.Player).Include(x => x.Mission)
             .FirstOrDefaultAsync(x => x.PlayerId == Guid.Parse(request.PlayerId), cancellationToken: cancellationToken);
+
         if (commandCenter is null)
         {
             throw new Exception();

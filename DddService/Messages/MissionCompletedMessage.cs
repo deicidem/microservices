@@ -8,5 +8,6 @@ public record MissionCompletedMessage(
     string Status,
     int Reinforcements,
     List<Guid> Squad,
+    int ObjectivesCompleted,
     string Timestamp
 );

@@ -16,7 +16,7 @@ public class MissionStartedDomainEventHandler : INotificationHandler<MissionStar
 
     public async Task Handle(MissionStartedDomainEvent notification, CancellationToken cancellationToken)
     {
-        var missionStartedMessage = new MissionStartedMessage(notification.Id, notification.Difficulty.GetDisplayName(), notification.Status.GetDisplayName(), notification.Reinforcements, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString());
+        var missionStartedMessage = new MissionStartedMessage(notification.Id, notification.Difficulty, notification.Status.GetDisplayName(), notification.Reinforcements, notification.Squad, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString());
         Console.WriteLine($"Mission has been Started at {DateTime.Now}: " + JsonSerializer.Serialize(missionStartedMessage));
         await _kafkaProducerService.ProduceAsync("MissionStarted", JsonSerializer.Serialize(missionStartedMessage));
     }

@@ -8,5 +8,6 @@ public record MissionCompletedDomainEvent(
     Difficulty Difficulty,
     MissionStatus Status,
     int Reinforcements,
-    List<Guid> Squad
+    List<Guid> Squad,
+    int ObjectivesCompleted
 ) : IDomainEvent;

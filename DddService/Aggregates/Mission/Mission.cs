@@ -182,7 +182,8 @@ public class Mission : Aggregate
             Id,
             Difficulty,
             Status,
-            Reinforcements
+            Reinforcements,
+            Squad.GetPlayers()
         );
 
         AddDomainEvent(@event);
@@ -207,10 +208,27 @@ public class Mission : Aggregate
             Difficulty,
             Status,
             Reinforcements,
-            Squad.GetPlayers()
+            Squad.GetPlayers(),
+            Objectives.Where(o => o.IsCompleted == IsCompleted.Of(true).Value).ToList().Count
         );
 
         AddDomainEvent(@event);
+    }
+
+    public void CompleteObjective()
+    {
+        if (Objectives.Count == 0)
+        {
+            throw new Exception();
+        }
+
+        var objective = Objectives.First(o => o.IsCompleted == IsCompleted.Of(false).Value);
+        objective.Complete();
+
+        if (Objectives.All(o => o.IsCompleted == IsCompleted.Of(true).Value))
+        {
+            Finish(MissionStatus.Completed);
+        }
     }
 
     private void UpdateStatus(MissionStatus status)
