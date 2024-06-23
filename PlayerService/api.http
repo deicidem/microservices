@@ -1,0 +1,16 @@
+@base_address = http://localhost:8080
+@player_id = c757fab8-afea-4dc1-8249-eafd1a660d79
+
+###
+GET {{base_address}}/players
+
+###
+GET {{base_address}}/players/{{player_id}}
+
+###
+POST {{base_address}}/players
+Content-Type: application/json
+
+{
+  "nickname": "deicidem 2"
+}
