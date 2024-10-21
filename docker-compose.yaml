@@ -1,4 +1,22 @@
 services:
+  postgres_master:
+    container_name: postgres_master
+    image: postgres:latest
+    restart: always
+    volumes:
+      - ./Database/data:/var/lib/postgresql/data
+      - ./Database/init-script/createdb.sql:/docker-entrypoint-initdb.d/createdb.sql
+      - ./Database/data-slave:/var/lib/postgresql/data-slave
+      - ./Database/init-script:/etc/postgresql/init-script
+      - ./Database/init-script/config/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./Database/init-script/config/postgres.conf:/etc/postgresql/postgresql.conf
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=helldivers
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
   broker:
     image: apache/kafka:latest
     hostname: broker
@@ -20,13 +38,14 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+
   clickhouse:
-    build: .
+    build: ./EventStore
     ports:
       - "8123:8123"
       - "9000:9000"
     volumes:
-      - ./data:/var/data
+      - ./EventStore/data:/var/data
     restart: always
 
   control-api:
@@ -46,7 +65,7 @@ services:
     depends_on:
       - us
     volumes:
-      - ./backend-configs:/etc/backend-configs
+      - ./EventStore/backend-configs:/etc/backend-configs
 
   data-api:
     container_name: datalens-data-api
@@ -66,7 +85,7 @@ services:
     depends_on:
       - us
     volumes:
-      - ./backend-configs:/etc/backend-configs
+      - ./EventStore/backend-configs:/etc/backend-configs
 
   pg-us:
     container_name: datalens-pg-us
@@ -76,7 +95,7 @@ services:
       POSTGRES_USER: us
       POSTGRES_PASSWORD: us
     volumes:
-      - ./metadata:/var/lib/postgresql/data
+      - ./EventStore/metadata:/var/lib/postgresql/data
 
   us:
     container_name: datalens-us
@@ -96,7 +115,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./certs:/certs
+      - ./EventStore/certs:/certs
 
   datalens:
     container_name: datalens-ui
@@ -117,7 +136,29 @@ services:
       BI_DATA_ENDPOINT: "http://data-api:8080"
       NODE_EXTRA_CA_CERTS: "/usr/local/share/ca-certificates/cert.pem"
       HC: 1
+
   consumer:
-    build: ../EventStore/Dockerfile
+    build: ./EventStore/go
     depends_on:
+      - broker
+
+  consul:
+    image: hashicorp/consul:latest
+    container_name: my-consul
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    command: agent -server -ui -node=server-1 -bootstrap-expect=1 --client=0.0.0.0
+    restart: unless-stopped
+
+  myapp:
+    build:
+      context: ./DddService
+      target: final
+    ports:
+      - "5027:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - postgres_master
       - broker

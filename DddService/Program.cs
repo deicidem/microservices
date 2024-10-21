@@ -22,7 +22,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<HelldiversDbContext>(options =>
 {
-    options.UseNpgsql("Host=localhost;Port=5433;Database=helldivers;Username=postgres;Password=postgres",
+    options.UseNpgsql("Host=postgres_master;Port=5432;Database=helldivers;Username=postgres;Password=postgres",
         b => b.MigrationsAssembly("DddService"));
 }, ServiceLifetime.Transient);
 

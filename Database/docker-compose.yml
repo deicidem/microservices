@@ -1,23 +1,7 @@
 version: '3'
 
 services:
-  postgres_master:
-    container_name: postgres_master
-    image: postgres:latest
-    restart: always
-    volumes:
-      - ./data:/var/lib/postgresql/data
-      - ./init-script/createdb.sql:/docker-entrypoint-initdb.d/createdb.sql
-      - ./data-slave:/var/lib/postgresql/data-slave
-      - ./init-script:/etc/postgresql/init-script
-      - ./init-script/config/pg_hba.conf:/etc/postgresql/pg_hba.conf
-      - ./init-script/config/postgres.conf:/etc/postgresql/postgresql.conf
-    ports:
-      - 5433:5432
-    environment:
-      - POSTGRES_DB=helldivers
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+
 
   # postgres_slave:
   #   container_name: postgres_slave

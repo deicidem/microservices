@@ -10,7 +10,7 @@ class Consumer
         const string topic = "MissionCompleted";
         var consumerConfig = new ConsumerConfig
         {
-            BootstrapServers = "localhost:9092",
+            BootstrapServers = "broker:19092",
             GroupId = "consumer-group-1",
             AutoOffsetReset = AutoOffsetReset.Earliest
         };
