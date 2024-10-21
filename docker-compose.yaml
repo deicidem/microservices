@@ -173,3 +173,14 @@ services:
     depends_on:
       - postgres_master
       - broker
+
+  reward-service:
+    build:
+      context: ./DddService/RewardSystem
+    ports:
+      - "5025:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - postgres_master
+      - broker
