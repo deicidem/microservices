@@ -1,6 +1,6 @@
 module main
 
-go 1.22.3
+go 1.23
 
 require (
 	github.com/go-chi/chi/v5 v5.0.14

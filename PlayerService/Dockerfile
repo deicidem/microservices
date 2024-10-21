@@ -6,18 +6,11 @@ RUN apk --no-cache update && \
     apk --no-cache add git gcc libc-dev
 
 # Set the current working directory inside the container
-
-ENV CGO_ENABLED 1
-ENV GOFLAGS -mod=vendor
-ENV GOOS=linux
-ENV GOARCH=amd64
-
-RUN export GO111MODULE=on
-
 WORKDIR /app
 
 # Copy the go mod and sum files
 COPY go.mod go.sum ./
+
 # Download and cache dependencies
 RUN go mod download
 
@@ -25,7 +18,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -tags musl -o consumer main.go
+RUN go build -o consumer main.go
 
 # Use a smaller base image for the runtime
 FROM alpine:3.17
