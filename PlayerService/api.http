@@ -1,4 +1,4 @@
-@base_address = http://localhost:5027/api
+@base_address = http://localhost:5026
 @player_id = c757fab8-afea-4dc1-8249-eafd1a660d79
 
 ###
