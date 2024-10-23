@@ -5,14 +5,16 @@
 			"ServiceName": "core",
 			"DownstreamPathTemplate": "/api/players",
 			"DownstreamScheme": "http",
-			"UpstreamPathTemplate": "/api/players",
-			"UpstreamHttpMethod": ["Get"],
-			"DownstreamHostAndPorts": [
-				{
-					"Host": "core",
-					"Port": 5027
-				}
-			]
+			"UpstreamPathTemplate": "/players",
+			"UpstreamHttpMethod": ["Get"]
+		},
+		{
+			"UseServiceDiscovery": true,
+			"ServiceName": "aggregator",
+			"DownstreamPathTemplate": "/first-player",
+			"DownstreamScheme": "http",
+			"UpstreamPathTemplate": "/first-player",
+			"UpstreamHttpMethod": ["Get"]
 		}
 	],
 	"GlobalConfiguration": {
