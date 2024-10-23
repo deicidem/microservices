@@ -1,0 +1,27 @@
+﻿{
+	"Routes": [
+		{
+			"UseServiceDiscovery": true,
+			"ServiceName": "core",
+			"DownstreamPathTemplate": "/api/players",
+			"DownstreamScheme": "http",
+			"UpstreamPathTemplate": "/api/players",
+			"UpstreamHttpMethod": ["Get"],
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "core",
+					"Port": 5027
+				}
+			]
+		}
+	],
+	"GlobalConfiguration": {
+		"BaseUrl": "http://gateway:5003",
+		"ServiceDiscoveryProvider": {
+			"Host": "consul",
+			"Port": 8500,
+			"Type": "PollConsul",
+			"PollingInterval": 100
+		}
+	}
+}

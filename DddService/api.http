@@ -1,4 +1,4 @@
-@base_address = http://localhost:5027
+@base_address = http://localhost:5003
 @player_id = c757fab8-afea-4dc1-8249-eafd1a660d79
 @command_center_id = 4d9adb07-1c7a-4a38-8683-cf47d7fdf323
 @command_center_2_id = 0044ca65-caf7-4c57-87b1-c9b5594c1b27

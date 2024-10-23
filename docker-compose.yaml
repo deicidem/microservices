@@ -163,6 +163,18 @@ services:
       - postgres_master
       - broker
 
+  gateway:
+    build:
+      context: ./Gateway
+      target: final
+    ports:
+      - "5003:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - core
+      - consul
+
   players-service:
     build:
       context: ./PlayerService
